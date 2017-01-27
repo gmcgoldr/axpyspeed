@@ -60,27 +60,41 @@ func TestNativeRange(t *testing.T) {
 	assertAXPY(t, x, y)
 }
 
-func TestNativeGo(t *testing.T) {
+func TestNativeGoRoutine(t *testing.T) {
 	x, y := makeData()
 	NativeGoRoutine(_a, x, y)
 	assertAXPY(t, x, y)
 }
 
-func TestC(t *testing.T) {
+func TestCgo(t *testing.T) {
 	x, y := makeData()
 	Cgo(_a, x, y)
 	assertAXPY(t, x, y)
 }
 
-func TestCSIMD(t *testing.T) {
+func TestCgoBroken(t *testing.T) {
+	// passes because x==y in the test so it is invariant to the failure
+	x, y := makeData()
+	CgoBroken(_a, x, y)
+	assertAXPY(t, x, y)
+}
+
+func TestCgoSIMDBroken(t *testing.T) {
+	// passes because x==y in the test so it is invariant to the failure
+	x, y := makeData()
+	CgoSIMDBroken(_a, x, y)
+	assertAXPY(t, x, y)
+}
+
+func TestCgoSIMD(t *testing.T) {
 	x, y := makeData()
 	CgoSIMD(_a, x, y)
 	assertAXPY(t, x, y)
 }
 
-func TestGonumBlas(t *testing.T) {
+func TestGonumBLAS(t *testing.T) {
 	x, y := makeData()
-	GonumBlas(_a, x, y)
+	GonumBLAS(_a, x, y)
 	assertAXPY(t, x, y)
 }
 
@@ -121,7 +135,7 @@ func BenchmarkNativeRange(b *testing.B) {
 	}
 }
 
-func BenchmarkNativeGo(b *testing.B) {
+func BenchmarkNativeGoRoutine(b *testing.B) {
 	x, y := makeData()
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -129,7 +143,7 @@ func BenchmarkNativeGo(b *testing.B) {
 	}
 }
 
-func BenchmarkC(b *testing.B) {
+func BenchmarkCgo(b *testing.B) {
 	x, y := makeData()
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -137,7 +151,7 @@ func BenchmarkC(b *testing.B) {
 	}
 }
 
-func BenchmarkCSIMD(b *testing.B) {
+func BenchmarkCgoSIMD(b *testing.B) {
 	x, y := makeData()
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -145,20 +159,36 @@ func BenchmarkCSIMD(b *testing.B) {
 	}
 }
 
-func BenchmarkGonumBlas(b *testing.B) {
+func BenchmarkCgoBroken(b *testing.B) {
+	x, y := makeData()
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		CgoBroken(_a, x, y)
+	}
+}
+
+func BenchmarkCgoSIMDBroken(b *testing.B) {
+	x, y := makeData()
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		CgoSIMDBroken(_a, x, y)
+	}
+}
+
+func BenchmarkGonumBLAS(b *testing.B) {
 	blas64.Use(native.Implementation{})
 	x, y := makeData()
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		GonumBlas(_a, x, y)
+		GonumBLAS(_a, x, y)
 	}
 }
 
-func BenchmarkGonumBlasCGO(b *testing.B) {
+func BenchmarkGonumBLASCGO(b *testing.B) {
 	blas64.Use(cgo.Implementation{})
 	x, y := makeData()
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		GonumBlas(_a, x, y)
+		GonumBLAS(_a, x, y)
 	}
 }

@@ -85,8 +85,32 @@ func CgoSIMD(a float64, x, y []float64) {
 		(*C.double)(&y[0]))
 }
 
-// GonumBlas calls gonum's implementation of axpy
-func GonumBlas(a float64, x, y []float64) {
+// CgoBroken calls the basic C implementation of axpy with using x=y. This is
+// broken because it computes y[i] = a*y[i] + y[i].
+func CgoBroken(a float64, x, y []float64) {
+	_ = x
+	n := len(x)
+	C.do_axpy(
+		C.int(n),
+		C.double(a),
+		(*C.double)(&y[0]),
+		(*C.double)(&y[0]))
+}
+
+// CgoSIMDBroken calls the basic C implementation of axpy with pragma omp simd
+// using y=x. This is broken because it computes y[i] = a*y[i] + y[i].
+func CgoSIMDBroken(a float64, x, y []float64) {
+	_ = y
+	n := len(x)
+	C.do_simd_axpy(
+		C.int(n),
+		C.double(a),
+		(*C.double)(&y[0]),
+		(*C.double)(&y[0]))
+}
+
+// GonumBLAS calls gonum's implementation of axpy
+func GonumBLAS(a float64, x, y []float64) {
 	n := len(x)
 	blas64.Implementation().Daxpy(n, a, x, 1, y, 1)
 }
